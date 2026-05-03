@@ -39,6 +39,12 @@ export function AuthProvider({ children }) {
     };
   }, [token]);
 
+  async function refreshUser() {
+    const response = await api.me();
+    setUser(response.user);
+    return response.user;
+  }
+
   async function login(email, password) {
     const response = await api.login({ email, password });
     localStorage.setItem('hms_token', response.token);
@@ -67,6 +73,7 @@ export function AuthProvider({ children }) {
         loading,
         login,
         logout,
+        refreshUser,
         isAuthenticated: Boolean(token && user)
       }}
     >
@@ -82,4 +89,3 @@ export function useAuth() {
   }
   return context;
 }
-

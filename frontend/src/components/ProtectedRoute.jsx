@@ -3,7 +3,15 @@ import { useAuth } from '../context/AuthContext';
 import { AppLayout } from './AppLayout';
 
 function roleHome(role) {
-  return role === 'doctor' ? '/doctor/dashboard' : '/staff/dashboard';
+  if (role === 'doctor') {
+    return '/doctor/dashboard';
+  }
+
+  if (role === 'admin') {
+    return '/medical-imaging';
+  }
+
+  return '/staff/dashboard';
 }
 
 export function ProtectedRoute({ allowedRoles }) {
@@ -23,4 +31,3 @@ export function ProtectedRoute({ allowedRoles }) {
 
   return <AppLayout />;
 }
-

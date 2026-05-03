@@ -28,10 +28,13 @@ const loginUser = asyncHandler(async (req, res) => {
   res.json({
     token,
     user: {
+      _id: user._id,
       id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      signature: user.signature || '',
+      profilePicture: user.profilePicture || ''
     }
   });
 });
@@ -71,10 +74,13 @@ const registerUser = asyncHandler(async (req, res) => {
   res.status(201).json({
     message: 'User registered successfully',
     user: {
+      _id: user._id,
       id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      signature: user.signature || '',
+      profilePicture: user.profilePicture || ''
     }
   });
 });
@@ -83,9 +89,35 @@ const getMe = asyncHandler(async (req, res) => {
   res.json({ user: req.user });
 });
 
+const updateMe = asyncHandler(async (req, res) => {
+  const { signature, profilePicture } = req.body;
+
+  if (signature !== undefined) {
+    req.user.signature = signature;
+  }
+
+  if (profilePicture !== undefined) {
+    req.user.profilePicture = profilePicture;
+  }
+
+  const updatedUser = await req.user.save();
+  res.json({
+    user: {
+      _id: updatedUser._id,
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      signature: updatedUser.signature || '',
+      profilePicture: updatedUser.profilePicture || ''
+    }
+  });
+});
+
 module.exports = {
   loginUser,
   logoutUser,
   registerUser,
-  getMe
+  getMe,
+  updateMe
 };

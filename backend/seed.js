@@ -18,6 +18,12 @@ async function seed() {
       email: 'staff@hospital.com',
       password: 'Staff@123',
       role: 'staff'
+    },
+    {
+      name: 'System Admin',
+      email: 'admin@hospital.com',
+      password: 'Admin@123',
+      role: 'admin'
     }
   ];
 
@@ -33,7 +39,7 @@ async function seed() {
     }
   }
 
-  console.log('Seeded demo doctor and staff users');
+  console.log('Seeded demo doctor, staff, and admin users');
   process.exit(0);
 }
 

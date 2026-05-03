@@ -18,7 +18,13 @@ export function Login() {
 
     try {
       const user = await login(email, password);
-      navigate(user.role === 'doctor' ? '/doctor/dashboard' : '/staff/dashboard', { replace: true });
+      if (user.role === 'doctor') {
+        navigate('/doctor/dashboard', { replace: true });
+      } else if (user.role === 'admin') {
+        navigate('/medical-imaging', { replace: true });
+      } else {
+        navigate('/staff/dashboard', { replace: true });
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -44,6 +50,7 @@ export function Login() {
           <div className="login-pill-row">
             <span>Doctor Portal</span>
             <span>Staff Portal</span>
+            <span>Admin Access</span>
             <span>IPD Workflow</span>
             <span>UPI Billing</span>
           </div>
@@ -79,6 +86,11 @@ export function Login() {
                 <strong>staff@hospital.com</strong>
                 <small>Staff@123</small>
               </div>
+              <div>
+                <span>Admin</span>
+                <strong>admin@hospital.com</strong>
+                <small>Admin@123</small>
+              </div>
             </div>
           </div>
         </section>
@@ -87,7 +99,7 @@ export function Login() {
           <div className="auth-card-header">
             <p className="eyebrow">Welcome back</p>
             <h2>Sign in to HMS</h2>
-            <p className="muted">Use your registered doctor or staff credentials.</p>
+            <p className="muted">Use your registered doctor, staff, or admin credentials.</p>
           </div>
 
           <div className="login-form-grid">
@@ -125,6 +137,9 @@ export function Login() {
 
           <p className="auth-footer">
             Need an account? <Link to="/register">Create one</Link>
+          </p>
+          <p className="auth-footer">
+            Need to view scans? <Link to="/medical-imaging/access">Open patient imaging access</Link>
           </p>
         </form>
       </div>

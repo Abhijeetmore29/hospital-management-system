@@ -22,8 +22,16 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['doctor', 'staff'],
+      enum: ['doctor', 'staff', 'admin'],
       default: 'staff'
+    },
+    signature: {
+      type: String,
+      default: ''
+    },
+    profilePicture: {
+      type: String,
+      default: ''
     }
   },
   { timestamps: true }
@@ -43,4 +51,3 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword)
 };
 
 module.exports = mongoose.model('User', userSchema);
-

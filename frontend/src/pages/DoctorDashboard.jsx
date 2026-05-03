@@ -8,11 +8,13 @@ export function DoctorDashboard() {
   const [summary, setSummary] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [admittedPatients, setAdmittedPatients] = useState([]);
+  const [waitingPatients, setWaitingPatients] = useState([]);
 
   useEffect(() => {
     api.dashboardSummary().then(setSummary).catch(() => setSummary(null));
     api.todayAppointments().then(setAppointments).catch(() => setAppointments([]));
     api.admittedPatients().then(setAdmittedPatients).catch(() => setAdmittedPatients([]));
+    api.waitingOpdPatients().then(setWaitingPatients).catch(() => setWaitingPatients([]));
   }, []);
 
   return (
@@ -27,10 +29,55 @@ export function DoctorDashboard() {
         <StatCard label="Completed Records" value={summary?.completedRecords ?? 0} tone="green" />
         <StatCard label="Pending Records" value={summary?.pendingRecords ?? 0} tone="amber" />
         <StatCard label="Admitted IPD" value={summary?.admittedPatients ?? 0} tone="green" />
+        <StatCard label="Waiting OPD" value={summary?.waitingOpdPatients ?? 0} tone="amber" />
         <StatCard label="Transactions" value={summary?.totalTransactions ?? 0} />
         <StatCard label="Operations" value={summary?.totalOperations ?? 0} tone="amber" />
         <StatCard label="Revenue" value={`Rs. ${summary?.totalRevenue ?? 0}`} tone="teal" />
       </div>
+      <section className="panel">
+        <div className="panel-head">
+          <h3>OPD Patients Waiting</h3>
+          <span className="muted">Pending and in-progress OPD patients</span>
+        </div>
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Disease</th>
+                <th>Assigned Doctor</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {waitingPatients.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="empty-cell">
+                    No OPD patients are waiting right now.
+                  </td>
+                </tr>
+              ) : (
+                waitingPatients.map((patient) => (
+                  <tr key={patient._id}>
+                    <td>{patient.name}</td>
+                    <td>{patient.disease}</td>
+                    <td>{patient.assignedDoctor?.name || '-'}</td>
+                    <td>
+                      <span className={`status-pill ${patient.status.toLowerCase()}`}>{patient.status}</span>
+                    </td>
+                    <td className="inline-actions">
+                      <Link className="text-link" to={`/prescriptions/${patient._id}`}>
+                        Open Record
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
       <section className="panel">
         <div className="panel-head">
           <h3>Today's Appointments</h3>
@@ -127,6 +174,9 @@ export function DoctorDashboard() {
         </Link>
         <Link className="secondary-button" to="/doctor/billing">
           Pricing & Transactions
+        </Link>
+        <Link className="secondary-button" to="/doctor/profile">
+          Doctor Profile
         </Link>
         <Link className="secondary-button" to="/operations">
           Operations

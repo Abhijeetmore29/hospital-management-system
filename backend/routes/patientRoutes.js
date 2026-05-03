@@ -3,6 +3,7 @@ const {
   createPatient,
   getPatients,
   getAdmittedPatients,
+  getWaitingOpdPatients,
   getPatientById,
   updatePatient,
   addPrescription,
@@ -16,10 +17,11 @@ const router = express.Router();
 router.use(protect);
 router.get('/', getPatients);
 router.get('/admitted', getAdmittedPatients);
-router.post('/', authorizeRoles('doctor', 'staff'), createPatient);
+router.get('/waiting-opd', getWaitingOpdPatients);
+router.post('/', authorizeRoles('doctor', 'staff', 'admin'), createPatient);
 router.get('/:id', getPatientById);
-router.patch('/:id', authorizeRoles('doctor', 'staff'), updatePatient);
+router.patch('/:id', authorizeRoles('doctor', 'staff', 'admin'), updatePatient);
 router.post('/:id/prescription', authorizeRoles('doctor'), addPrescription);
-router.post('/:id/discharge', authorizeRoles('doctor', 'staff'), dischargePatient);
+router.post('/:id/discharge', authorizeRoles('doctor', 'staff', 'admin'), dischargePatient);
 
 module.exports = router;

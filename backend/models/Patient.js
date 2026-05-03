@@ -53,6 +53,10 @@ const patientSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    requiredTests: {
+      type: String,
+      default: ''
+    },
     status: {
       type: String,
       enum: ['Pending', 'In Progress', 'Admitted', 'Completed', 'Discharged'],

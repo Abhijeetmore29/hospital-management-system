@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+const FILE_BASE_URL = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_URL.replace(/\/api$/, '');
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('hms_token');
@@ -26,14 +27,37 @@ async function request(path, options = {}) {
   return data;
 }
 
+function publicRequest(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+
+  return fetch(`${API_URL}${path}`, {
+    ...options,
+    headers
+  }).then(async (response) => {
+    const isJson = response.headers.get('content-type')?.includes('application/json');
+    const data = isJson ? await response.json() : null;
+
+    if (!response.ok) {
+      throw new Error(data?.message || 'Request failed');
+    }
+
+    return data;
+  });
+}
+
 export const api = {
   login: (payload) => request('/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
   register: (payload) => request('/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   logout: () => request('/auth/logout', { method: 'POST' }),
   me: () => request('/auth/me'),
+  updateMe: (payload) => request('/auth/me', { method: 'PATCH', body: JSON.stringify(payload) }),
   doctors: () => request('/users/doctors'),
   dashboardSummary: () => request('/dashboard/summary'),
   admittedPatients: () => request('/patients/admitted'),
+  waitingOpdPatients: () => request('/patients/waiting-opd'),
   pricingMine: () => request('/pricing/mine'),
   pricingAll: () => request('/pricing'),
   savePricingMine: (payload) => request('/pricing/mine', { method: 'POST', body: JSON.stringify(payload) }),
@@ -53,5 +77,26 @@ export const api = {
   operations: (query = '') => request(`/operations${query}`),
   operation: (id) => request(`/operations/${id}`),
   createOperation: (payload) => request('/operations', { method: 'POST', body: JSON.stringify(payload) }),
-  updateOperation: (id, payload) => request(`/operations/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+  updateOperation: (id, payload) => request(`/operations/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  medicalImages: (query = '') => request(`/medical-images${query}`),
+  medicalImage: (id) => request(`/medical-images/${id}`),
+  createMedicalImage: (payload) => request('/medical-images', { method: 'POST', body: JSON.stringify(payload) }),
+  saveImagingReport: (id, payload) => request(`/medical-images/${id}/report`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  deleteMedicalImage: (id) => request(`/medical-images/${id}`, { method: 'DELETE' })
+};
+
+export function buildFileUrl(filePath) {
+  if (!filePath) {
+    return '';
+  }
+
+  if (/^https?:\/\//i.test(filePath) || filePath.startsWith('data:')) {
+    return filePath;
+  }
+
+  return `${FILE_BASE_URL}${filePath}`;
+}
+
+export const publicApi = {
+  medicalImagesAccess: (payload) => publicRequest(`/medical-images/public?patientId=${encodeURIComponent(payload.patientId)}&phone=${encodeURIComponent(payload.phone)}`)
 };

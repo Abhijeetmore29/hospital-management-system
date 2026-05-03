@@ -7,7 +7,7 @@ export function PrescriptionEditor() {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const [patient, setPatient] = useState(null);
-  const [form, setForm] = useState({ diagnosis: '', doctorPrescription: '', status: 'In Progress' });
+  const [form, setForm] = useState({ diagnosis: '', doctorPrescription: '', requiredTests: '', status: 'In Progress' });
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -23,6 +23,7 @@ export function PrescriptionEditor() {
       setForm({
         diagnosis: data.diagnosis || '',
         doctorPrescription: data.doctorPrescription || '',
+        requiredTests: data.requiredTests || '',
         status: data.status || 'In Progress'
       });
       setLoading(false);
@@ -102,6 +103,16 @@ export function PrescriptionEditor() {
           <label className="full-span">
             <span>Doctor Prescription / Notes</span>
             <textarea name="doctorPrescription" rows="6" value={form.doctorPrescription} onChange={updateField} required />
+          </label>
+          <label className="full-span">
+            <span>Required Tests / Investigations</span>
+            <textarea
+              name="requiredTests"
+              rows="4"
+              value={form.requiredTests}
+              onChange={updateField}
+              placeholder="Write any lab tests, X-Ray, CT Scan, MRI, or other investigations needed."
+            />
           </label>
           <label>
             <span>Status</span>

@@ -10,4 +10,3 @@ const getDoctors = asyncHandler(async (req, res) => {
 });
 
 module.exports = { getDoctors };
-

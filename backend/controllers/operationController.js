@@ -96,7 +96,7 @@ const getOperations = asyncHandler(async (req, res) => {
 const getOperationById = asyncHandler(async (req, res) => {
   const operation = await Operation.findById(req.params.id)
     .populate('patient', 'name age gender phone disease type roomType status paymentStatus')
-    .populate('doctor', 'name email role')
+    .populate('doctor', 'name email role signature')
     .populate('createdBy', 'name email role');
 
   if (!operation) {
@@ -139,4 +139,3 @@ module.exports = {
   getOperationById,
   updateOperation
 };
-

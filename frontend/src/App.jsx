@@ -9,6 +9,9 @@ import { AppointmentList } from './pages/AppointmentList';
 import { PrescriptionEditor } from './pages/PrescriptionEditor';
 import { PrintablePrescription } from './pages/PrintablePrescription';
 import { DoctorBilling } from './pages/DoctorBilling';
+import { DoctorProfile } from './pages/DoctorProfile';
+import { MedicalImaging } from './pages/MedicalImaging';
+import { PatientImagingPortal } from './pages/PatientImagingPortal';
 import { StaffPayments } from './pages/StaffPayments';
 import { DoctorAdmittedPatients } from './pages/DoctorAdmittedPatients';
 import { Operations } from './pages/Operations';
@@ -20,6 +23,14 @@ import { useAuth } from './context/AuthContext';
 
 function AppRoutes() {
   const { user, isAuthenticated } = useAuth();
+  const fallbackPath =
+    isAuthenticated && user
+      ? user.role === 'doctor'
+        ? '/doctor/dashboard'
+        : user.role === 'admin'
+          ? '/medical-imaging'
+          : '/staff/dashboard'
+      : '/login';
 
   return (
     <Routes>
@@ -29,6 +40,7 @@ function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={['doctor']} />}>
         <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
         <Route path="/doctor/billing" element={<DoctorBilling />} />
+        <Route path="/doctor/profile" element={<DoctorProfile />} />
         <Route path="/doctor/admitted-patients" element={<DoctorAdmittedPatients />} />
         <Route path="/prescriptions/:patientId" element={<PrescriptionEditor />} />
       </Route>
@@ -37,7 +49,8 @@ function AppRoutes() {
         <Route path="/patients/add" element={<AddPatient />} />
         <Route path="/payments" element={<StaffPayments />} />
       </Route>
-      <Route element={<ProtectedRoute allowedRoles={['doctor', 'staff']} />}>
+      <Route element={<ProtectedRoute allowedRoles={['doctor', 'staff', 'admin']} />}>
+        <Route path="/medical-imaging" element={<MedicalImaging />} />
         <Route path="/patients" element={<PatientList />} />
         <Route path="/patients/:patientId/discharge" element={<DischargePatient />} />
         <Route path="/appointments" element={<AppointmentList />} />
@@ -47,19 +60,9 @@ function AppRoutes() {
       </Route>
       <Route
         path="*"
-        element={
-          <Navigate
-            to={
-              isAuthenticated
-                ? user?.role === 'doctor'
-                  ? '/doctor/dashboard'
-                  : '/staff/dashboard'
-                : '/login'
-            }
-            replace
-          />
-        }
+        element={<Navigate to={fallbackPath} replace />}
       />
+      <Route path="/medical-imaging/access" element={<PatientImagingPortal />} />
     </Routes>
   );
 }

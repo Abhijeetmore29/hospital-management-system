@@ -20,10 +20,12 @@ Production-ready hospital management app built with:
 - Doctor pricing setup and transaction ledger
 - Admitted IPD patients module for doctors
 - Operation module for doctor and staff workflows
+- Medical imaging module for scan upload, viewing, reporting, printing, and management
 - IPD discharge flow
 - Printable surgery sheet for operations
 - Patient list with search
 - Prescription editor and printable prescription layout
+- Public patient imaging access page for read-only scan lookup
 - Protected routes and role redirects
 
 ## Project Structure
@@ -35,6 +37,7 @@ Production-ready hospital management app built with:
 
 - Doctor: `doctor@hospital.com` / `Doctor@123`
 - Staff: `staff@hospital.com` / `Staff@123`
+- Admin: `admin@hospital.com` / `Admin@123`
 
 ## Setup
 
@@ -61,7 +64,7 @@ Production-ready hospital management app built with:
    npm run seed
    ```
 
-   If you previously seeded the database before the auth fix, rerun this command to refresh the demo doctor and staff passwords.
+   If you previously seeded the database before the auth fix, rerun this command to refresh the demo doctor, staff, and admin passwords.
 
 6. Start the app:
 
@@ -96,6 +99,22 @@ Production-ready hospital management app built with:
 - `GET /api/appointments/today`
 - `POST /api/appointments`
 - `GET /api/users/doctors`
+- `GET /api/medical-images`
+- `GET /api/medical-images/public`
+- `GET /api/medical-images/:id`
+- `POST /api/medical-images`
+- `PATCH /api/medical-images/:id/report`
+- `DELETE /api/medical-images/:id`
+
+## Imaging Flow
+
+1. Doctor or staff opens `Medical Imaging`.
+2. Select a patient, doctor, optional appointment, image type, body part, and scan date.
+3. Upload one or more scan files.
+4. Open a scan inline, zoom it, add doctor findings, and save as draft or finalize it.
+5. Finalized reports are read-only.
+6. Admin can delete scans when needed.
+7. Patients can open the public imaging access page with patient ID and phone to view their own scans and reports.
 
 ## Print Flow
 

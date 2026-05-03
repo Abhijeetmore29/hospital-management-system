@@ -75,10 +75,28 @@ const getAdmittedPatients = asyncHandler(async (req, res) => {
   res.json(patients);
 });
 
+const getWaitingOpdPatients = asyncHandler(async (req, res) => {
+  const query = {
+    type: 'OPD',
+    status: { $in: ['Pending', 'In Progress'] }
+  };
+
+  if (req.user.role === 'doctor') {
+    query.assignedDoctor = req.user._id;
+  }
+
+  const patients = await Patient.find(query)
+    .populate('createdBy', 'name role')
+    .populate('assignedDoctor', 'name role')
+    .sort({ updatedAt: -1, createdAt: -1 });
+
+  res.json(patients);
+});
+
 const getPatientById = asyncHandler(async (req, res) => {
   const patient = await Patient.findById(req.params.id)
     .populate('createdBy', 'name role')
-    .populate('assignedDoctor', 'name role')
+    .populate('assignedDoctor', 'name role signature')
     .populate('dischargedBy', 'name role');
 
   if (!patient) {
@@ -97,7 +115,7 @@ const updatePatient = asyncHandler(async (req, res) => {
     throw new Error('Patient not found');
   }
 
-  const fields = ['name', 'age', 'gender', 'address', 'phone', 'disease', 'appointmentDate', 'type', 'roomType', 'status', 'diagnosis', 'assignedDoctor', 'paymentStatus'];
+  const fields = ['name', 'age', 'gender', 'address', 'phone', 'disease', 'appointmentDate', 'type', 'roomType', 'status', 'diagnosis', 'requiredTests', 'assignedDoctor', 'paymentStatus'];
   fields.forEach((field) => {
     if (req.body[field] !== undefined) {
       patient[field] = req.body[field];
@@ -118,6 +136,7 @@ const addPrescription = asyncHandler(async (req, res) => {
 
   patient.diagnosis = req.body.diagnosis ?? patient.diagnosis;
   patient.doctorPrescription = req.body.doctorPrescription ?? patient.doctorPrescription;
+  patient.requiredTests = req.body.requiredTests ?? patient.requiredTests;
   patient.status = req.body.status || patient.status || 'Completed';
 
   const updatedPatient = await patient.save();
@@ -150,6 +169,7 @@ module.exports = {
   createPatient,
   getPatients,
   getAdmittedPatients,
+  getWaitingOpdPatients,
   getPatientById,
   updatePatient,
   addPrescription,

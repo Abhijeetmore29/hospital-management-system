@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
+const path = require('path');
 
 const { loadEnv } = require('./config/env');
 const { connectDB } = require('./config/db');
@@ -16,6 +17,7 @@ const userRoutes = require('./routes/userRoutes');
 const pricingRoutes = require('./routes/pricingRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const operationRoutes = require('./routes/operationRoutes');
+const medicalImageRoutes = require('./routes/medicalImageRoutes');
 
 const env = loadEnv();
 const app = express();
@@ -23,14 +25,26 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin: (origin, callback) => {
+      const isLocalOrigin =
+        typeof origin === 'string' &&
+        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+      if (!origin || origin === env.clientUrl || isLocalOrigin) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`CORS blocked for origin ${origin}`));
+    },
     credentials: true
   })
 );
 app.use(compression());
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'hospital-management-system' });
@@ -44,6 +58,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/operations', operationRoutes);
+app.use('/api/medical-images', medicalImageRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

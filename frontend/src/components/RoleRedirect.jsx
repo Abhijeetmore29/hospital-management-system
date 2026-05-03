@@ -12,6 +12,13 @@ export function RoleRedirect() {
     return <Navigate to="/login" replace />;
   }
 
-  return <Navigate to={user?.role === 'doctor' ? '/doctor/dashboard' : '/staff/dashboard'} replace />;
-}
+  if (user?.role === 'doctor') {
+    return <Navigate to="/doctor/dashboard" replace />;
+  }
 
+  if (user?.role === 'admin') {
+    return <Navigate to="/medical-imaging" replace />;
+  }
+
+  return <Navigate to="/staff/dashboard" replace />;
+}

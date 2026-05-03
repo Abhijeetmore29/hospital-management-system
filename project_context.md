@@ -10,11 +10,13 @@ This is a production-oriented Hospital Management System built as a monorepo wit
 - Authentication: JWT
 - Styling: custom responsive CSS, no Tailwind, no Bootstrap
 - Architecture: MVC on the backend
+- Frontend favicon is a custom SVG medical cross stored at `frontend/public/favicon.svg`
 
-The app is designed for two roles:
+The app is designed for three roles:
 
 - Doctor
 - Staff / Reception
+- Admin
 
 ## Current Product Scope
 
@@ -22,13 +24,25 @@ The app currently supports:
 
 - Login and logout
 - Role-based access control
-- Doctor and staff registration
-- Doctor dashboard with admitted IPD visibility, appointments, transactions, and operations
+- Doctor and staff registration, plus a seeded admin account for imaging management
+- Doctor dashboard with admitted IPD visibility, OPD waiting patients, appointments, transactions, and operations
+- Doctor profile page for uploading a signature image used in printable clinical documents
+- Doctor profile page for uploading both a profile picture and signature image
+- Doctor sidebar navigation now shows Doctor Profile at the top for quick access
+- Doctor sidebar navigation order is Doctor Profile, Dashboard, Appointments, Patient Record, Operations, Admitted Patients, Medical Images, then Pricing & Transactions
+- Medical Imaging module for upload, viewing, reporting, printing, and management of scans
+- Public patient imaging access page for read-only scan lookup using patient ID and phone
 - Staff dashboard with patient registration, payments, appointments, and operations access
 - Patient registration and search
 - OPD / IPD patient workflow
 - IPD admission and discharge flow
 - Prescription editing and printable prescription layout
+- Prescription editing now includes a required tests / investigations field for lab work and imaging requests
+- Doctor profile signature image support for prescription and operation printouts
+- Doctor profile picture support with header/avatar preview
+- Medical imaging upload stores files on disk under `backend/uploads/medical-images` and references them from MongoDB
+- Medical imaging reports support draft and final states; finalized reports are read-only
+- Scan deletion is restricted to admin in the current role model
 - Doctor pricing setup for billing
 - Payment collection for OPD and IPD
 - Doctor UPI ID / payee details for UPI collection
@@ -136,6 +150,7 @@ The doctor portal currently includes:
 - dashboard summary cards
 - today’s appointments
 - admitted IPD patient list
+- OPD waiting patient queue
 - pricing and transactions page
 - prescription editing
 - printable prescription view
@@ -160,6 +175,7 @@ The staff portal currently includes:
 There are two important print layouts:
 
 - Prescription print view
+- Prescription print view includes requested tests / investigations
 - Operation / surgery sheet print view
 
 Both use dedicated print-friendly pages with:
@@ -177,6 +193,7 @@ These are the seed/demo accounts currently documented:
 
 - Doctor: `doctor@hospital.com` / `Doctor@123`
 - Staff: `staff@hospital.com` / `Staff@123`
+- Admin: `admin@hospital.com` / `Admin@123`
 
 If login fails for these accounts, reseed the database because earlier seed data may have stale password hashes.
 
@@ -191,6 +208,19 @@ From the repo root:
 3. Set `MONGO_URI` in backend env
 4. Run `npm run seed`
 5. Run `npm run dev`
+
+## Local Dev Networking Notes
+
+- The frontend now uses a Vite proxy for `/api`, so browser requests stay same-origin during local development.
+- The backend CORS setup allows local `localhost` and `127.0.0.1` origins on any port during development.
+- The frontend API base defaults to `/api` instead of hardcoding `http://localhost:5000/api`.
+
+## Doctor Signature Workflow
+
+- Doctors can open `Doctor Profile` from the sidebar after login.
+- The profile page lets doctors upload a signature image.
+- The signature is stored on the `User` record and is reused in printable prescription and operation sheets.
+- If no signature image is uploaded, print layouts fall back to the existing signature line.
 
 ## Implementation Conventions
 

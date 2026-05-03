@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { PageHeader } from '../components/PageHeader';
+import { isSignatureImage } from '../utils/signature';
 
 export function OperationPrint() {
   const { operationId } = useParams();
@@ -110,7 +111,19 @@ export function OperationPrint() {
         <div className="signature-block">
           <div>
             <span>Surgeon Signature</span>
-            <div className="signature-line" />
+            {operation.doctor?.signature ? (
+              isSignatureImage(operation.doctor.signature) ? (
+                <img
+                  className="signature-image signature-image-print"
+                  src={operation.doctor.signature}
+                  alt="Surgeon signature"
+                />
+              ) : (
+                <div className="signature-text signature-text-print">{operation.doctor.signature}</div>
+              )
+            ) : (
+              <div className="signature-line" />
+            )}
           </div>
         </div>
       </section>
@@ -122,4 +135,3 @@ export function OperationPrint() {
     </div>
   );
 }
-

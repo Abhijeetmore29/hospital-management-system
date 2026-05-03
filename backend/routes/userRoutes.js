@@ -6,7 +6,6 @@ const { authorizeRoles } = require('../middleware/roleMiddleware');
 const router = express.Router();
 
 router.use(protect);
-router.get('/doctors', authorizeRoles('doctor', 'staff'), getDoctors);
+router.get('/doctors', authorizeRoles('doctor', 'staff', 'admin'), getDoctors);
 
 module.exports = router;
-

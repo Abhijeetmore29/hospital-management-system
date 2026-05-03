@@ -21,11 +21,12 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
 
   const patientFilter = req.user.role === 'doctor' ? { assignedDoctor: req.user._id } : {};
 
-  const [totalPatients, opdPatients, ipdPatients, admittedPatients, todayAppointments, completedRecords, pendingRecords, totalOperations, paymentsSummary] = await Promise.all([
+  const [totalPatients, opdPatients, ipdPatients, admittedPatients, waitingOpdPatients, todayAppointments, completedRecords, pendingRecords, totalOperations, paymentsSummary] = await Promise.all([
     Patient.countDocuments(patientFilter),
     Patient.countDocuments({ ...patientFilter, type: 'OPD' }),
     Patient.countDocuments({ ...patientFilter, type: 'IPD' }),
     Patient.countDocuments({ ...patientFilter, type: 'IPD', status: 'Admitted' }),
+    Patient.countDocuments({ ...patientFilter, type: 'OPD', status: { $in: ['Pending', 'In Progress'] } }),
     Appointment.countDocuments(appointmentQuery),
     Patient.countDocuments({ ...patientFilter, status: 'Completed' }),
     Patient.countDocuments({ ...patientFilter, status: 'Pending' }),
@@ -47,6 +48,7 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
     opdPatients,
     ipdPatients,
     admittedPatients,
+    waitingOpdPatients,
     todayAppointments,
     completedRecords,
     pendingRecords,

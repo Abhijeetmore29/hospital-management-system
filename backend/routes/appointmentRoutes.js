@@ -13,8 +13,7 @@ const router = express.Router();
 router.use(protect);
 router.get('/today', getTodaysAppointments);
 router.get('/', getAppointments);
-router.post('/', authorizeRoles('doctor', 'staff'), createAppointment);
+router.post('/', authorizeRoles('doctor', 'staff', 'admin'), createAppointment);
 router.patch('/:id', authorizeRoles('doctor'), updateAppointment);
 
 module.exports = router;
-

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { PageHeader } from '../components/PageHeader';
+import { isSignatureImage } from '../utils/signature';
 
 export function PrintablePrescription() {
   const { patientId } = useParams();
@@ -78,13 +79,29 @@ export function PrintablePrescription() {
           <pre>{patient.doctorPrescription || 'No prescription has been written yet.'}</pre>
         </div>
         <div className="print-section">
+          <span>Required Tests / Investigations</span>
+          <pre>{patient.requiredTests || 'No tests have been requested.'}</pre>
+        </div>
+        <div className="print-section">
           <span>Diagnosis</span>
           <p>{patient.diagnosis || 'Pending review'}</p>
         </div>
         <div className="signature-block">
           <div>
             <span>Signature</span>
-            <div className="signature-line" />
+            {patient.assignedDoctor?.signature ? (
+              isSignatureImage(patient.assignedDoctor.signature) ? (
+                <img
+                  className="signature-image signature-image-print"
+                  src={patient.assignedDoctor.signature}
+                  alt="Doctor signature"
+                />
+              ) : (
+                <div className="signature-text signature-text-print">{patient.assignedDoctor.signature}</div>
+              )
+            ) : (
+              <div className="signature-line" />
+            )}
           </div>
         </div>
       </section>
