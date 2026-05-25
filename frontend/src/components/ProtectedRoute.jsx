@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { AppLayout } from './AppLayout';
 
@@ -14,7 +14,7 @@ function roleHome(role) {
   return '/staff/dashboard';
 }
 
-export function ProtectedRoute({ allowedRoles }) {
+export function ProtectedRoute({ allowedRoles, layout = 'app' }) {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
@@ -29,5 +29,5 @@ export function ProtectedRoute({ allowedRoles }) {
     return <Navigate to={roleHome(user.role)} replace />;
   }
 
-  return <AppLayout />;
+  return layout === 'app' ? <AppLayout /> : <Outlet />;
 }

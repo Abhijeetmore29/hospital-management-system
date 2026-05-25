@@ -27,6 +27,8 @@ const protect = asyncHandler(async (req, res, next) => {
     throw new Error('Not authorized, user not found');
   }
 
+  user.canAccessAdmin = user.role === 'doctor';
+  user.isAdmin = user.role === 'admin';
   req.user = user;
   next();
 });

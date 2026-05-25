@@ -15,8 +15,8 @@ export function AppLayout() {
       { to: '/appointments', label: 'Appointments' },
       { to: '/patients', label: 'Patient Record' },
       { to: '/operations', label: 'Operations' },
-      { to: '/doctor/admitted-patients', label: 'Admitted Patients' },
-      { to: '/medical-imaging', label: 'Medical Images' },
+      { to: '/doctor/ipd', label: 'IPD' },
+      { to: '/doctor/laboratory', label: 'Laboratory' },
       { to: '/doctor/billing', label: 'Pricing & Transactions' }
     ];
   } else if (user?.role === 'admin') {
@@ -47,9 +47,9 @@ export function AppLayout() {
       <aside className="sidebar">
         <div>
           <div className="brand">
-            <div className="brand-mark">HMS</div>
+            <div className="brand-mark">M</div>
             <div>
-              <strong>Hospital System</strong>
+              <strong>Meditrack</strong>
               <span>{user?.role === 'doctor' ? 'Doctor Portal' : user?.role === 'admin' ? 'Admin Portal' : 'Reception Portal'}</span>
             </div>
           </div>

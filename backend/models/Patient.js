@@ -27,6 +27,10 @@ const patientSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    bloodGroup: {
+      type: String,
+      default: ''
+    },
     disease: {
       type: String,
       required: true,

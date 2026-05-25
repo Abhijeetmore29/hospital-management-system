@@ -83,28 +83,34 @@ export function MedicalImaging() {
   useEffect(() => {
     let active = true;
 
-    Promise.all([api.patients(), api.doctors(), api.appointments()])
-      .then(([patientData, doctorData, appointmentData]) => {
-        if (!active) {
-          return;
-        }
+    function loadData() {
+      Promise.all([api.patients(), api.doctors(), api.appointments()])
+        .then(([patientData, doctorData, appointmentData]) => {
+          if (!active) {
+            return;
+          }
 
-        setPatients(patientData);
-        setDoctors(doctorData);
-        setAppointments(appointmentData);
-      })
-      .catch(() => {
-        if (!active) {
-          return;
-        }
+          setPatients(patientData);
+          setDoctors(doctorData);
+          setAppointments(appointmentData);
+        })
+        .catch(() => {
+          if (!active) {
+            return;
+          }
 
-        setPatients([]);
-        setDoctors([]);
-        setAppointments([]);
-      });
+          setPatients([]);
+          setDoctors([]);
+          setAppointments([]);
+        });
+    }
+
+    loadData();
+    window.addEventListener('doctor:list:updated', loadData);
 
     return () => {
       active = false;
+      window.removeEventListener('doctor:list:updated', loadData);
     };
   }, []);
 

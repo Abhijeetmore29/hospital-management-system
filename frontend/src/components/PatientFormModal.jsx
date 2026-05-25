@@ -8,7 +8,9 @@ const initialForm = {
   gender: 'Male',
   address: '',
   phone: '',
+  bloodGroup: '',
   disease: '',
+  visitType: 'New',
   type: 'OPD',
   roomType: 'AC',
   appointmentDate: '',
@@ -27,7 +29,27 @@ export function PatientFormModal({ open, onClose, onSaved }) {
       return;
     }
 
-    api.doctors().then(setDoctors).catch(() => setDoctors([]));
+    let active = true;
+
+    function loadDoctors() {
+      api.doctors().then((data) => {
+        if (active) {
+          setDoctors(data);
+        }
+      }).catch(() => {
+        if (active) {
+          setDoctors([]);
+        }
+      });
+    }
+
+    loadDoctors();
+    window.addEventListener('doctor:list:updated', loadDoctors);
+
+    return () => {
+      active = false;
+      window.removeEventListener('doctor:list:updated', loadDoctors);
+    };
   }, [open]);
 
   function updateField(event) {
@@ -41,15 +63,17 @@ export function PatientFormModal({ open, onClose, onSaved }) {
     setMessage('');
 
     try {
-      const patient = await api.createPatient({
-        name: form.name,
-        age: Number(form.age),
-        gender: form.gender,
-        address: form.address,
-        phone: form.phone,
-        disease: form.disease,
-        type: form.type,
-        roomType: form.type === 'IPD' ? form.roomType : undefined,
+        const patient = await api.createPatient({
+          name: form.name,
+          age: Number(form.age),
+          gender: form.gender,
+          address: form.address,
+          phone: form.phone,
+          bloodGroup: form.bloodGroup,
+          disease: form.disease,
+          visitType: form.visitType,
+          type: form.type,
+          roomType: form.type === 'IPD' ? form.roomType : undefined,
         appointmentDate: form.appointmentDate || undefined,
         assignedDoctor: form.doctorId || undefined
       });
@@ -100,6 +124,10 @@ export function PatientFormModal({ open, onClose, onSaved }) {
           <span>Phone</span>
           <input name="phone" value={form.phone} onChange={updateField} required />
         </label>
+        <label>
+          <span>Blood Group</span>
+          <input name="bloodGroup" value={form.bloodGroup} onChange={updateField} placeholder="O+, A-, B+" />
+        </label>
         <label className="full-span">
           <span>Address</span>
           <textarea name="address" value={form.address} onChange={updateField} required rows="2" />
@@ -109,7 +137,15 @@ export function PatientFormModal({ open, onClose, onSaved }) {
           <input name="disease" value={form.disease} onChange={updateField} required />
         </label>
         <label>
-          <span>Type</span>
+          <span>Visit Type</span>
+          <select name="visitType" value={form.visitType} onChange={updateField}>
+            <option value="New">New</option>
+            <option value="Follow-up">Follow-up</option>
+            <option value="Procedure">Procedure</option>
+          </select>
+        </label>
+        <label>
+          <span>Patient Type</span>
           <select name="type" value={form.type} onChange={updateField}>
             <option value="OPD">OPD</option>
             <option value="IPD">IPD</option>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api';
-import { PageHeader } from '../components/PageHeader';
+import StaffHeader from '../components/StaffHeader';
 
 const emptyPayment = {
   patientId: '',
@@ -47,17 +47,37 @@ export function StaffPayments() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    Promise.all([api.payments(), api.patients(), api.pricingAll()])
-      .then(([paymentData, patientData, doctorData]) => {
-        setPayments(paymentData);
-        setPatients(patientData);
-        setDoctorBundle(doctorData);
-      })
-      .catch(() => {
-        setPayments([]);
-        setPatients([]);
-        setDoctorBundle({ pricing: [], doctors: [] });
-      });
+    let active = true;
+
+    function loadData() {
+      Promise.all([api.payments(), api.patients(), api.pricingAll()])
+        .then(([paymentData, patientData, doctorData]) => {
+          if (!active) {
+            return;
+          }
+
+          setPayments(paymentData);
+          setPatients(patientData);
+          setDoctorBundle(doctorData);
+        })
+        .catch(() => {
+          if (!active) {
+            return;
+          }
+
+          setPayments([]);
+          setPatients([]);
+          setDoctorBundle({ pricing: [], doctors: [] });
+        });
+    }
+
+    loadData();
+    window.addEventListener('doctor:list:updated', loadData);
+
+    return () => {
+      active = false;
+      window.removeEventListener('doctor:list:updated', loadData);
+    };
   }, []);
 
   const pricingMap = useMemo(() => {
@@ -110,10 +130,7 @@ export function StaffPayments() {
 
   return (
     <div className="stack">
-      <PageHeader
-        title="Payments"
-        subtitle="Collect OPD and IPD payments using doctor-defined prices."
-      />
+      <StaffHeader title="Payments" subtitle="Collect OPD and IPD payments using doctor-defined prices." />
 
       <section className="panel">
         <div className="panel-head">

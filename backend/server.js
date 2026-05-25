@@ -18,6 +18,13 @@ const pricingRoutes = require('./routes/pricingRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const operationRoutes = require('./routes/operationRoutes');
 const medicalImageRoutes = require('./routes/medicalImageRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const { getDoctors } = require('./controllers/userController');
+const { getOpdQueue } = require('./controllers/appointmentController');
+const consultationRoutes = require('./routes/consultationRoutes');
+const prescriptionRoutes = require('./routes/prescriptionRoutes');
+const billingRoutes = require('./routes/billingRoutes');
+const paymentSettingsRoutes = require('./routes/paymentSettingsRoutes');
 
 const env = loadEnv();
 const app = express();
@@ -49,6 +56,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'hospital-management-system' });
 });
+app.get('/api/doctors', getDoctors);
+app.get('/api/opd-queue', getOpdQueue);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
@@ -59,6 +68,11 @@ app.use('/api/pricing', pricingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/operations', operationRoutes);
 app.use('/api/medical-images', medicalImageRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/consultations', consultationRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/billing', billingRoutes);
+app.use('/api/payment-settings', paymentSettingsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

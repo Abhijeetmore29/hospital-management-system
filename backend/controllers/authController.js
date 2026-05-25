@@ -10,6 +10,28 @@ function signToken(user) {
   );
 }
 
+function serializeAuthUser(user) {
+  return {
+    _id: user._id,
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone || '',
+    role: user.role,
+    department: user.department || user.staffRole || '',
+    specialization: user.specialization || '',
+    experience: user.experience || '',
+    qualification: user.qualification || '',
+    address: user.address || '',
+    profileImage: user.profilePicture || '',
+    profilePicture: user.profilePicture || '',
+    signature: user.signature || '',
+    joinedDate: user.createdAt || null,
+    canAccessAdmin: user.role === 'doctor',
+    isAdmin: user.role === 'admin'
+  };
+}
+
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -27,15 +49,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const token = signToken(user);
   res.json({
     token,
-    user: {
-      _id: user._id,
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      signature: user.signature || '',
-      profilePicture: user.profilePicture || ''
-    }
+    user: serializeAuthUser(user)
   });
 });
 
@@ -73,24 +87,21 @@ const registerUser = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     message: 'User registered successfully',
-    user: {
-      _id: user._id,
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      signature: user.signature || '',
-      profilePicture: user.profilePicture || ''
-    }
+    user: serializeAuthUser(user)
   });
 });
 
 const getMe = asyncHandler(async (req, res) => {
-  res.json({ user: req.user });
+  const user = await User.findById(req.user.id || req.user._id).select('-password');
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+  res.json({ user: serializeAuthUser(user) });
 });
 
 const updateMe = asyncHandler(async (req, res) => {
-  const { signature, profilePicture } = req.body;
+  const { signature, profilePicture, address, phone } = req.body;
 
   if (signature !== undefined) {
     req.user.signature = signature;
@@ -100,17 +111,17 @@ const updateMe = asyncHandler(async (req, res) => {
     req.user.profilePicture = profilePicture;
   }
 
+  if (address !== undefined) {
+    req.user.address = address;
+  }
+
+  if (phone !== undefined) {
+    req.user.phone = phone;
+  }
+
   const updatedUser = await req.user.save();
   res.json({
-    user: {
-      _id: updatedUser._id,
-      id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      role: updatedUser.role,
-      signature: updatedUser.signature || '',
-      profilePicture: updatedUser.profilePicture || ''
-    }
+    user: serializeAuthUser(updatedUser)
   });
 });
 

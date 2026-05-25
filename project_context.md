@@ -2,7 +2,7 @@
 
 ## What This Project Is
 
-This is a production-oriented Hospital Management System built as a monorepo with:
+This is a production-oriented Meditrack hospital management app built as a monorepo with:
 
 - Frontend: React + Vite
 - Backend: Node.js + Express
@@ -43,10 +43,17 @@ The app currently supports:
 - Medical imaging upload stores files on disk under `backend/uploads/medical-images` and references them from MongoDB
 - Medical imaging reports support draft and final states; finalized reports are read-only
 - Scan deletion is restricted to admin in the current role model
+- Medical imaging deletion now removes the matching file from `backend/uploads/medical-images` when the file is stored locally
 - Doctor pricing setup for billing
 - Payment collection for OPD and IPD
 - Doctor UPI ID / payee details for UPI collection
 - Operation records and printable surgery sheet
+- Doctor routes now include working `/doctor/profile` and `/doctor/admitted-patients` entries again
+- Doctor billing now has dedicated detail and create pages:
+  - `/doctor/billing/view/:billingId`
+  - `/doctor/billing/create/:appointmentId`
+- Billing records now support consultation, laboratory, medicine, additional charges, discount, total amount, payment method, billing date, and paid status updates
+- Payment settings are exposed through `/api/payment-settings` and can provide UPI, bank, and QR details for the billing create page
 
 ## Important Business Rules
 
@@ -107,6 +114,7 @@ Root frontend folder:
 - `frontend/src/components/` - reusable layout, modal, route guard, header, cards
 - `frontend/src/pages/` - login, register, dashboards, patient list, payments, operations, print views, discharge page
 - `frontend/src/styles.css` - all UI styling
+- The staff and admin dashboard pages now pull live summary/activity data from the API while keeping the same visual layout
 
 ## UX / UI Direction
 
@@ -127,8 +135,8 @@ Auth pages were intentionally redesigned with:
 - matching modern login and registration screens
 - professional auth hero content and elevated form cards
 - login page now has a distinct premium hero layout with metrics, demo cards, and a compact form card
-- login hero title "Hospital Management System" / main hero text should remain white for contrast on the dark gradient background
-- the subtitle text directly below the HMS logo on the login hero ("Hospital Management System") should stay bright/white for contrast
+- login hero title "Meditrack" / main hero text should remain white for contrast on the dark gradient background
+- the subtitle text directly below the logo on the login hero ("Meditrack") should stay bright/white for contrast
 - the login hero eyebrow/subtitle color should now be black on the current login layout
 - the login hero card background is now a light medical gradient, with dark heading/subtitle text and lighter supporting cards for contrast
 - the login hero card should use the original dark green/teal gradient style, with white hero text and glassy supporting cards
@@ -193,7 +201,7 @@ These are the seed/demo accounts currently documented:
 
 - Doctor: `doctor@hospital.com` / `Doctor@123`
 - Staff: `staff@hospital.com` / `Staff@123`
-- Admin: `admin@hospital.com` / `Admin@123`
+- Admin: `abhi@gmail.com` / `123456`
 
 If login fails for these accounts, reseed the database because earlier seed data may have stale password hashes.
 
@@ -249,4 +257,5 @@ If you are a future Codex instance working in this repo:
   - frontend page
   - sidebar/navigation
   - README
+- If you add a local upload-backed module, make sure delete flows clean up both the Mongo record and the stored file on disk.
 - Whenever you make changes in this project without asking the user first, update this `project_context.md` file with the new modules, rules, routes, or implementation notes so the next session has accurate context.

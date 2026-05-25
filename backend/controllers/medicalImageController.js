@@ -63,6 +63,28 @@ function resolveExtension(fileName, mimeType) {
   return path.extname(lowerName) || '.bin';
 }
 
+async function removeStoredImage(filePath) {
+  if (!filePath || /^data:/i.test(filePath) || /^https?:\/\//i.test(filePath)) {
+    return;
+  }
+
+  const uploadsRoot = path.resolve(__dirname, '..', 'uploads');
+  const candidatePath = path.resolve(__dirname, '..', String(filePath).replace(/^\/+/, ''));
+  const relativePath = path.relative(uploadsRoot, candidatePath);
+
+  if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+    return;
+  }
+
+  try {
+    await fs.unlink(candidatePath);
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+}
+
 async function attachReports(images) {
   const imageIds = images.map((image) => image._id);
   const reports = await ImagingReport.find({ image: { $in: imageIds } })
@@ -314,6 +336,7 @@ const deleteMedicalImage = asyncHandler(async (req, res) => {
     throw new Error('Medical image not found');
   }
 
+  await removeStoredImage(image.filePath);
   await ImagingReport.deleteOne({ image: image._id });
   await image.deleteOne();
 

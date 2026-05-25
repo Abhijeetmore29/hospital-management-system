@@ -1,4 +1,4 @@
-# Hospital Management System
+# Meditrack
 
 Production-ready hospital management app built with:
 
@@ -37,7 +37,7 @@ Production-ready hospital management app built with:
 
 - Doctor: `doctor@hospital.com` / `Doctor@123`
 - Staff: `staff@hospital.com` / `Staff@123`
-- Admin: `admin@hospital.com` / `Admin@123`
+- Admin: `abhi@gmail.com` / `123456`
 
 ## Setup
 

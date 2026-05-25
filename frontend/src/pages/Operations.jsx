@@ -30,21 +30,41 @@ export function Operations() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    Promise.all([api.operations(), api.admittedPatients(), api.doctors()])
-      .then(([ops, admittedPatients, doctorList]) => {
-        setOperations(ops);
-        setPatients(admittedPatients);
-        setDoctors(doctorList);
-        setForm((current) => ({
-          ...current,
-          doctorId: user?.role === 'doctor' ? user._id : current.doctorId
-        }));
-      })
-      .catch(() => {
-        setOperations([]);
-        setPatients([]);
-        setDoctors([]);
-      });
+    let active = true;
+
+    function loadData() {
+      Promise.all([api.operations(), api.admittedPatients(), api.doctors()])
+        .then(([ops, admittedPatients, doctorList]) => {
+          if (!active) {
+            return;
+          }
+
+          setOperations(ops);
+          setPatients(admittedPatients);
+          setDoctors(doctorList);
+          setForm((current) => ({
+            ...current,
+            doctorId: user?.role === 'doctor' ? user._id : current.doctorId
+          }));
+        })
+        .catch(() => {
+          if (!active) {
+            return;
+          }
+
+          setOperations([]);
+          setPatients([]);
+          setDoctors([]);
+        });
+    }
+
+    loadData();
+    window.addEventListener('doctor:list:updated', loadData);
+
+    return () => {
+      active = false;
+      window.removeEventListener('doctor:list:updated', loadData);
+    };
   }, [user]);
 
   useEffect(() => {

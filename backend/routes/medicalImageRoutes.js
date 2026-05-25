@@ -19,6 +19,6 @@ router.get('/', authorizeRoles('doctor', 'staff', 'admin'), getMedicalImages);
 router.get('/:id', authorizeRoles('doctor', 'staff', 'admin'), getMedicalImageById);
 router.post('/', authorizeRoles('doctor', 'staff', 'admin'), uploadMedicalImage);
 router.patch('/:id/report', authorizeRoles('doctor'), saveImagingReport);
-router.delete('/:id', authorizeRoles('admin'), deleteMedicalImage);
+router.delete('/:id', authorizeRoles('doctor'), deleteMedicalImage);
 
 module.exports = router;

@@ -22,6 +22,7 @@ const createPatient = asyncHandler(async (req, res) => {
     gender: req.body.gender,
     address: req.body.address,
     phone: req.body.phone,
+    bloodGroup: req.body.bloodGroup || '',
     disease: req.body.disease,
     appointmentDate: req.body.appointmentDate || undefined,
     type: req.body.type || 'OPD',
@@ -115,7 +116,7 @@ const updatePatient = asyncHandler(async (req, res) => {
     throw new Error('Patient not found');
   }
 
-  const fields = ['name', 'age', 'gender', 'address', 'phone', 'disease', 'appointmentDate', 'type', 'roomType', 'status', 'diagnosis', 'requiredTests', 'assignedDoctor', 'paymentStatus'];
+  const fields = ['name', 'age', 'gender', 'address', 'phone', 'bloodGroup', 'disease', 'appointmentDate', 'type', 'roomType', 'status', 'diagnosis', 'requiredTests', 'assignedDoctor', 'paymentStatus'];
   fields.forEach((field) => {
     if (req.body[field] !== undefined) {
       patient[field] = req.body[field];
@@ -165,6 +166,27 @@ const dischargePatient = asyncHandler(async (req, res) => {
   res.json(updatedPatient);
 });
 
+const getPatientHistory = asyncHandler(async (req, res) => {
+  const patient = await Patient.findById(req.params.id)
+    .populate('assignedDoctor', 'name role signature')
+    .populate('createdBy', 'name role');
+
+  if (!patient) {
+    res.status(404);
+    throw new Error('Patient not found');
+  }
+
+  const appointments = await require('../models/Appointment').find({ patient: patient._id })
+    .populate('doctor', 'name email role')
+    .sort({ appointmentDate: -1, createdAt: -1 });
+
+  const payments = await require('../models/Payment').find({ patient: patient._id })
+    .populate('doctor', 'name email role')
+    .sort({ createdAt: -1 });
+
+  res.json({ patient, appointments, payments });
+});
+
 module.exports = {
   createPatient,
   getPatients,
@@ -173,5 +195,6 @@ module.exports = {
   getPatientById,
   updatePatient,
   addPrescription,
-  dischargePatient
+  dischargePatient,
+  getPatientHistory
 };

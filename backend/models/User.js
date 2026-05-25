@@ -25,6 +25,38 @@ const userSchema = new mongoose.Schema(
       enum: ['doctor', 'staff', 'admin'],
       default: 'staff'
     },
+    specialization: {
+      type: String,
+      default: ''
+    },
+    department: {
+      type: String,
+      default: ''
+    },
+    staffRole: {
+      type: String,
+      default: ''
+    },
+    experience: {
+      type: String,
+      default: ''
+    },
+    qualification: {
+      type: String,
+      default: ''
+    },
+    phone: {
+      type: String,
+      default: ''
+    },
+    address: {
+      type: String,
+      default: ''
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
     signature: {
       type: String,
       default: ''
@@ -32,6 +64,10 @@ const userSchema = new mongoose.Schema(
     profilePicture: {
       type: String,
       default: ''
+    },
+    permissions: {
+      type: [String],
+      default: []
     }
   },
   { timestamps: true }

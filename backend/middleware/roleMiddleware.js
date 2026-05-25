@@ -2,7 +2,7 @@ function authorizeRoles(...allowedRoles) {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
       res.status(403);
-      return next(new Error('Forbidden: insufficient role'));
+      return next(new Error('Forbidden'));
     }
 
     next();
@@ -10,4 +10,3 @@ function authorizeRoles(...allowedRoles) {
 }
 
 module.exports = { authorizeRoles };
-

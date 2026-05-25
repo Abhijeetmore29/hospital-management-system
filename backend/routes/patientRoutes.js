@@ -5,6 +5,7 @@ const {
   getAdmittedPatients,
   getWaitingOpdPatients,
   getPatientById,
+  getPatientHistory,
   updatePatient,
   addPrescription,
   dischargePatient
@@ -20,6 +21,7 @@ router.get('/admitted', getAdmittedPatients);
 router.get('/waiting-opd', getWaitingOpdPatients);
 router.post('/', authorizeRoles('doctor', 'staff', 'admin'), createPatient);
 router.get('/:id', getPatientById);
+router.get('/:id/history', getPatientHistory);
 router.patch('/:id', authorizeRoles('doctor', 'staff', 'admin'), updatePatient);
 router.post('/:id/prescription', authorizeRoles('doctor'), addPrescription);
 router.post('/:id/discharge', authorizeRoles('doctor', 'staff', 'admin'), dischargePatient);

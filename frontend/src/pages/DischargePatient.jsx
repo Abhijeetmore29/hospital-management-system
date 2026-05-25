@@ -39,7 +39,7 @@ export function DischargePatient() {
     try {
       await api.dischargePatient(patientId, form);
       setMessage('Patient discharged successfully.');
-      navigate('/doctor/admitted-patients');
+      navigate('/doctor/ipd');
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -95,7 +95,7 @@ export function DischargePatient() {
             />
           </label>
           <div className="full-span actions-row">
-            <button type="button" className="secondary-button" onClick={() => navigate('/doctor/admitted-patients')}>
+            <button type="button" className="secondary-button" onClick={() => navigate('/doctor/ipd')}>
               Cancel
             </button>
             <button className="primary-button" type="submit" disabled={saving}>
@@ -108,4 +108,3 @@ export function DischargePatient() {
     </div>
   );
 }
-
